@@ -143,6 +143,9 @@ class DPCTGAN(CTGANSynthesizer, Synthesizer):
     :param diabled_dp: Allows training without differential privacy, to diagnose
         whether any model issues are caused by privacy or are simply the
         result of GAN instability or other issues with hyperparameters.
+    :param secure_rng: If on, it will use ``torchcsprng`` for secure random number
+        generation. Comes with a significant performance cost, therefore it's 
+        recommended that you turn it off when just experimenting.
 
     """
     def __init__(
@@ -165,7 +168,8 @@ class DPCTGAN(CTGANSynthesizer, Synthesizer):
         sigma=5,
         max_per_sample_grad_norm=1.0,
         epsilon=1,
-        loss="cross_entropy"
+        loss="cross_entropy",
+        secure_rng=False
     ):
 
         assert batch_size % 2 == 0
@@ -197,6 +201,7 @@ class DPCTGAN(CTGANSynthesizer, Synthesizer):
         self.loss_g_list = []
         self.verbose = verbose
         self.loss = loss
+        self.secure_rng = secure_rng
 
         if not cuda or not torch.cuda.is_available():
             device = "cpu"
@@ -287,6 +292,7 @@ class DPCTGAN(CTGANSynthesizer, Synthesizer):
             noise_multiplier=self.sigma,
             max_grad_norm=self.max_per_sample_grad_norm,
             clip_per_layer=True,
+            secure_rng=self.secure_rng
         )
 
         if not self.disabled_dp:

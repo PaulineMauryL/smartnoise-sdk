@@ -36,6 +36,7 @@ class DPGAN(Synthesizer):
 
         self.pd_cols = None
         self.pd_index = None
+        self.secure_rng = secure_rng
 
     def train(
         self,
@@ -96,6 +97,7 @@ class DPGAN(Synthesizer):
             noise_multiplier=3.5,
             max_grad_norm=1.0,
             clip_per_layer=True,
+            secure_rng=self.secure_rng
         )
 
         privacy_engine.attach(optimizer_d)
